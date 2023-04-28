@@ -1,0 +1,12 @@
+name: playground-prefect
+
+channels:
+    - conda-forge
+
+dependencies:
+    - python = 3.10
+    - ipykernel
+    - jupytext
+
+    - pandas
+    - prefect
