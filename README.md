@@ -38,8 +38,11 @@
 
 ## To Do
 
-- TODO: Add `black` and other linting and code formatting tools
-- TODO: Turn this into an installable package
-- TODO: Handle requirements and development environment
-- TODO: Add documentation skeleton
-- TODO: Add Prefect/Juypter integration
+- Best practices
+  - TODO: Add `black` and other linting and code formatting tools
+  - TODO: Turn this into an installable package
+  - TODO: Handle requirements and development environment
+  - TODO: Add documentation skeleton
+- Prefect
+  - TODO: Add Prefect/Juypter integration
+  - TODO: Try out [parallel subflows](https://docs.prefect.io/latest/concepts/flows/#composing-flows)

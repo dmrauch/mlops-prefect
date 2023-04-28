@@ -18,9 +18,9 @@
 # %autoreload 2
 
 # %%
-import prefect_trial.module1
+import playground_prefect.module1
 
 # %%
-prefect_trial.module1.hello_flow()
+playground_prefect.module1.hello_flow()
 
 # %%
