@@ -4,8 +4,12 @@
 In the end, this repository will contain and showcase the following aspects of an end-to-end machine learning project:
 
 - there will be a pipeline to
-  - [ ] generate data: cluster IDs and 3D cartesian coordinates
-  - [ ] transform the data: 3D cartesian -> spherical coordinates
+  - [ ] generate data: cluster IDs and cartesian coordinates
+    - [X] 2D
+    - [ ] 3D
+  - [ ] transform the data
+    - [X] 2D cartesian -> polar coordinates
+    - [ ] 3D cartesian -> spherical coordinates
   - [ ] train an ML model: classify the coordinates to the cluster IDs
   - [ ] evaluate the model
     - [ ] performance metrics
@@ -14,14 +18,23 @@ In the end, this repository will contain and showcase the following aspects of a
       - [ ] mean Shapley values
     - [ ] local feature importance
       - [ ] Shapley values
+- advanced features
+  - machine learning
+    - [ ] hyperparameter optimisation by means of cross validation
+    - [ ] add derived features and run automatic feature selection
+      - [ ] *scikit-learn*
+      - [ ] *tsfresh*
+  - *Prefect*
+    - [ ] caching of intermediate pipeline results
 - [ ] the pipeline will be implemented with [*Prefect*](https://www.prefect.io/)
   - [ ] add Prefect/Juypter integration
   - [ ] try out [parallel subflows](https://docs.prefect.io/latest/concepts/flows/#composing-flows)
 - [ ] experiments will be tracked with *MLflow*
   - [ ] using not the *local filesystem*, but rather the *SQLite* backend store option, in order to support model serving
 - best practices
-  - [ ] use test-driven development
+  - [X] use test-driven development
   - [ ] add *Black* and other linting and code formatting tools
+  - [ ] automatically check test coverage
   - [ ] an automatic source code documentation built using *Sphinx*
   - [X] development environments and installation requirements should be handled in a clean and consistent way
   - [ ] the code will be built into a package using *Poetry*
@@ -39,6 +52,12 @@ In the end, this repository will contain and showcase the following aspects of a
   - [Integrations](https://docs.prefect.io/latest/integrations/)
     - [Juypter](https://prefecthq.github.io/prefect-jupyter/) (based on papermill)
     - [GCP](https://prefecthq.github.io/prefect-gcp/)
+
+
+## Thoughts and Questions
+
+- Adding 3D coordinates gives an opportunity to use tSNE for creating a 2D visualisation
+- Does *Prefect* have a concept of configuration files to pass parameters to the pipeline or to override default parameters of individual tasks?
 
 
 ## Getting Started

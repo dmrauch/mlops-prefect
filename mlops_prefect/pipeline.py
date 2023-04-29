@@ -3,6 +3,7 @@ import pandas as pd
 import prefect
 
 import mlops_prefect.data
+import mlops_prefect.transform
 
 
 @prefect.task
@@ -25,6 +26,9 @@ def pipeline() -> pd.DataFrame:
 
     # generate synthetic data
     df = mlops_prefect.data.generate()
+
+    # transform cartesian to polar coordinates
+    df = mlops_prefect.transform.cartesian_to_polar(df)
 
     # TODO: train ML classification
     # TODO: plot the true, predicted and misclassified point clouds
