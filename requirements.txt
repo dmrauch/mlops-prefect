@@ -1,0 +1,5 @@
+hvplot
+pandas
+prefect
+pytest
+scikit-learn
