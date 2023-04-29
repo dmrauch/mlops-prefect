@@ -18,9 +18,13 @@
 # %autoreload 2
 
 # %%
-import playground_prefect.module1
+import mlops_prefect.pipeline
+import mlops_prefect.data
 
 # %%
-playground_prefect.module1.hello_flow()
+df = mlops_prefect.pipeline.pipeline()
+
+# %%
+mlops_prefect.data.plot(df)
 
 # %%
