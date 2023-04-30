@@ -27,7 +27,7 @@ In the end, this repository will contain and showcase the following aspects of a
   - [ ] use caching of intermediate pipeline results
   - [ ] add Prefect/Juypter integration
   - [ ] try out [parallel subflows](https://docs.prefect.io/latest/concepts/flows/#composing-flows)
-    - need to use `.submit` as per [doc](https://docs.prefect.io/latest/guides/dask-ray-task-runners/)
+    - need to use `.submit` as per [doc: guide](https://docs.prefect.io/latest/guides/dask-ray-task-runners/) and [doc: tutorial](https://docs.prefect.io/latest/tutorials/execution/)
 - [ ] experiments will be tracked with *MLflow*
   - [ ] using not the *local filesystem*, but rather the *SQLite* backend store option, in order to support model serving
 - best practices
@@ -59,6 +59,7 @@ In the end, this repository will contain and showcase the following aspects of a
 - [ ] How best to generate visualisations and dataframe printouts during
   intermediate steps of the pipeline and transport them outside?
   - I'm not sure all of this diagnostic information should be logged to *MLflow*
+  - Perhaps that's what [artifact](https://docs.prefect.io/latest/concepts/artifacts/) mechanism is for
 
 
 ## Thoughts and Notes
@@ -124,3 +125,32 @@ In the end, this repository will contain and showcase the following aspects of a
     ```
 
     This will by default start the web UI at http://127.0.0.1:4200
+
+
+## Prefect Cheat Sheet
+
+### Settings and Profiles
+
+- Specify or change a setting:
+  ```(bash)
+  $ prefect config set PREFECT_TASKS_REFRESH_CACHE='True'
+  ```
+- Reset to the default value:
+  ```(bash)
+  $ prefect config unset PREFECT_TASKS_REFRESH_CACHE
+  ```
+- View the currently active settings:
+  ```(bash)
+  $ prefect config view
+  ```
+
+#### Profiles
+
+- List all available profiles:
+  ```(bash)
+  $ prefect profile ls
+  ```
+- View the settings associated with the currently active profile:
+  ```(bash)
+  $ prefect profile inspect
+  ```

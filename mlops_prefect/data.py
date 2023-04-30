@@ -3,10 +3,15 @@ import holoviews as hv
 import hvplot.pandas
 import pandas as pd
 import prefect
+import prefect.tasks
 import sklearn.datasets
 
+import mlops_prefect.cache
 
-@prefect.task
+
+@prefect.task(task_run_name='generate-{n_dims}D',
+              cache_key_fn=prefect.tasks.task_input_hash)
+               # cache_key_fn=mlops_prefect.cache.cache_within_flow_run)
 def generate(seed: int = 0,
              n_samples: int = 10_000,
              n_modes: int = 3,

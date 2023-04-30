@@ -1,6 +1,7 @@
 import numpy as np
 import pandas as pd
 import prefect
+import prefect.tasks
 from typing import Union
 
 
@@ -36,7 +37,7 @@ def get_phi(x: Union[float, np.ndarray],
     return np.arctan2(y, x)
 
 
-@prefect.task
+@prefect.task(cache_key_fn=prefect.tasks.task_input_hash)
 def cartesian_to_polar(df: pd.DataFrame,
                        col_x: str = 'x',
                        col_y: str = 'y',
@@ -93,7 +94,7 @@ def cartesian_to_polar(df: pd.DataFrame,
     return df
 
 
-@prefect.task
+@prefect.task(cache_key_fn=prefect.tasks.task_input_hash)
 def cartesian_to_spherical(df: pd.DataFrame,
                            col_x: str = 'x',
                            col_y: str = 'y',
@@ -131,6 +132,8 @@ def cartesian_to_spherical(df: pd.DataFrame,
     The dataframe with three additional columns containing the radii
     as well as polar and azimuthal angles
     '''
+    print('Converting 3D cartesian to spherical coordinates')
+
     # this would change the original df that was passed in
     # - you can try this out and should see the unit tests fail
     # df[col_r] = np.sqrt(df[col_x]**2 + df[col_y]**2 + df[col_z]**2)
