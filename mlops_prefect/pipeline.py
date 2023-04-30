@@ -18,7 +18,8 @@ def task_hello() -> None:
 @prefect.flow(
         name='cluster-classification',
         flow_run_name=dt.datetime.now().strftime('%Y%m%d-%H%M%S'))
-def pipeline(n_dims: int = 2) -> pd.DataFrame:
+def pipeline(n_dims: int = 2,
+             algorithm: str = 'DecisionTree') -> pd.DataFrame:
     '''
     Complete pipeline from data generation to model validation
     '''
@@ -38,7 +39,7 @@ def pipeline(n_dims: int = 2) -> pd.DataFrame:
     df = mlops_prefect.data.split(df)
 
     # train ML classification model
-    model = mlops_prefect.model.train(df)
+    model = mlops_prefect.model.train(df, algorithm=algorithm)
 
     # [ ] evaluate the model
     # [ ] plot the true, predicted and misclassified point clouds

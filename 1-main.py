@@ -27,7 +27,7 @@ import mlops_prefect.data
 # ## Run the Pipeline
 
 # %%
-df, model = mlops_prefect.pipeline.pipeline(n_dims=3)
+df, model = mlops_prefect.pipeline.pipeline(n_dims=3, algorithm='RandomForest')
 
 # %% [markdown]
 # ## Results: Generated Data
