@@ -23,11 +23,24 @@ import pandas as pd
 import mlops_prefect.pipeline
 import mlops_prefect.data
 
+# %% [markdown]
+# ## Run the Pipeline
+
 # %%
 df, model = mlops_prefect.pipeline.pipeline(n_dims=3)
 
+# %% [markdown]
+# ## Results: Generated Data
+
 # %%
 df
+
+# %%
+# plot the cartesian coordinates
+mlops_prefect.data.plot(df)
+
+# %% [markdown]
+# ### Train/Test Split
 
 # %%
 # calculate the overall relative dataset sizes
@@ -55,9 +68,8 @@ df.dataset.value_counts()
     .set_index(['cluster', 'dataset'])
 )
 
-# %%
-# plot the cartesian coordinates
-mlops_prefect.data.plot(df)
+# %% [markdown]
+# ## Results: Model
 
 # %%
 model
@@ -67,5 +79,34 @@ df[df.dataset == 'test']
 
 # %%
 model.predict(df.loc[df.dataset == 'test', ['x', 'y', 'z']])
+
+# %% [markdown]
+# ### Performance
+
+# %%
+import sklearn.metrics
+
+# %%
+# variant 1: the score method -> most limited
+model.score(X=df.loc[df.dataset == 'test', ['x', 'y', 'z']],
+            y=df.loc[df.dataset == 'test', 'cluster'])
+
+# %%
+# variant 2: metrics functions 
+cm_plot = (
+    sklearn.metrics.ConfusionMatrixDisplay.from_estimator(
+        estimator=model,
+        X=df.loc[df.dataset == 'test', ['x', 'y', 'z']],
+        y=df.loc[df.dataset == 'test', 'cluster'])
+    .plot()
+)
+
+# %%
+# variant 2 (continued): metrics functions
+print(
+    sklearn.metrics.classification_report(
+        y_true=df.loc[df.dataset == 'test', 'cluster'],
+        y_pred=model.predict(X=df.loc[df.dataset == 'test', ['x', 'y', 'z']]),
+        digits=3))
 
 # %%

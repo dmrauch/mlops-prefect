@@ -1,4 +1,5 @@
 hvplot
+matplotlib
 pandas
 prefect
 pytest

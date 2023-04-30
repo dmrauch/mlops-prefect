@@ -55,6 +55,7 @@ def generate(seed: int = 0,
         n_samples=n_samples,
         n_features=n_dims,
         centers=n_modes,
+        cluster_std=2.0,
         random_state=seed
     )
 
