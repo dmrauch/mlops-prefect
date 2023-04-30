@@ -4,6 +4,7 @@ import prefect
 
 import mlops_prefect.data
 import mlops_prefect.transform
+import mlops_prefect.model
 
 
 @prefect.task
@@ -33,13 +34,15 @@ def pipeline(n_dims: int = 2) -> pd.DataFrame:
     elif n_dims == 3:
         df = mlops_prefect.transform.cartesian_to_spherical(df)
 
-    # train/test split
-    # df_train, df_test = mlops_prefect.data.split(df)
+    # train/test split: add a 'dataset' column to the dataframe
     df = mlops_prefect.data.split(df)
 
-    # TODO: train ML classification
-    # TODO: plot the true, predicted and misclassified point clouds
+    # train ML classification model
+    model = mlops_prefect.model.train(df)
+
+    # [ ] evaluate the model
+    # [ ] plot the true, predicted and misclassified point clouds
 
     print("Finished the flow!")
 
-    return df
+    return df, model

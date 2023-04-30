@@ -24,7 +24,7 @@ import mlops_prefect.pipeline
 import mlops_prefect.data
 
 # %%
-df = mlops_prefect.pipeline.pipeline(n_dims=3)
+df, model = mlops_prefect.pipeline.pipeline(n_dims=3)
 
 # %%
 df
@@ -58,5 +58,14 @@ df.dataset.value_counts()
 # %%
 # plot the cartesian coordinates
 mlops_prefect.data.plot(df)
+
+# %%
+model
+
+# %%
+df[df.dataset == 'test']
+
+# %%
+model.predict(df.loc[df.dataset == 'test', ['x', 'y', 'z']])
 
 # %%
