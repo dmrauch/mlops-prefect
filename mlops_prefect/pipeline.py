@@ -17,7 +17,7 @@ def task_hello() -> None:
 @prefect.flow(
         name='cluster-classification',
         flow_run_name=dt.datetime.now().strftime('%Y%m%d-%H%M%S'))
-def pipeline() -> pd.DataFrame:
+def pipeline(n_dims: int = 2) -> pd.DataFrame:
     '''
     Complete pipeline from data generation to model validation
     '''
@@ -25,10 +25,13 @@ def pipeline() -> pd.DataFrame:
     task_hello()
 
     # generate synthetic data
-    df = mlops_prefect.data.generate()
+    df = mlops_prefect.data.generate(n_dims=n_dims)
 
     # transform cartesian to polar coordinates
-    df = mlops_prefect.transform.cartesian_to_polar(df)
+    if n_dims == 2:
+        df = mlops_prefect.transform.cartesian_to_polar(df)
+    elif n_dims == 3:
+        df = mlops_prefect.transform.cartesian_to_spherical(df)
 
     # TODO: train ML classification
     # TODO: plot the true, predicted and misclassified point clouds

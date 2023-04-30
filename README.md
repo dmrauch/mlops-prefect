@@ -4,12 +4,12 @@
 In the end, this repository will contain and showcase the following aspects of an end-to-end machine learning project:
 
 - there will be a pipeline to
-  - [ ] generate data: cluster IDs and cartesian coordinates
+  - [X] generate data: cluster IDs and cartesian coordinates
     - [X] 2D
-    - [ ] 3D
-  - [ ] transform the data
+    - [X] 3D
+  - [X] transform the data
     - [X] 2D cartesian -> polar coordinates
-    - [ ] 3D cartesian -> spherical coordinates
+    - [X] 3D cartesian -> spherical coordinates
   - [ ] train an ML model: classify the coordinates to the cluster IDs
   - [ ] evaluate the model
     - [ ] performance metrics
@@ -18,17 +18,16 @@ In the end, this repository will contain and showcase the following aspects of a
       - [ ] mean Shapley values
     - [ ] local feature importance
       - [ ] Shapley values
-- advanced features
-  - machine learning
+  - advanced features
     - [ ] hyperparameter optimisation by means of cross validation
     - [ ] add derived features and run automatic feature selection
       - [ ] *scikit-learn*
       - [ ] *tsfresh*
-  - *Prefect*
-    - [ ] caching of intermediate pipeline results
 - [ ] the pipeline will be implemented with [*Prefect*](https://www.prefect.io/)
+  - [ ] use caching of intermediate pipeline results
   - [ ] add Prefect/Juypter integration
   - [ ] try out [parallel subflows](https://docs.prefect.io/latest/concepts/flows/#composing-flows)
+    - need to use `.submit` as per [doc](https://docs.prefect.io/latest/guides/dask-ray-task-runners/)
 - [ ] experiments will be tracked with *MLflow*
   - [ ] using not the *local filesystem*, but rather the *SQLite* backend store option, in order to support model serving
 - best practices
@@ -54,10 +53,29 @@ In the end, this repository will contain and showcase the following aspects of a
     - [GCP](https://prefecthq.github.io/prefect-gcp/)
 
 
-## Thoughts and Questions
+## Questions
+
+- [ ] Does *Prefect* have a concept of configuration files to pass parameters to the pipeline or to override default parameters of individual tasks?
+- [ ] How best to generate visualisations and dataframe printouts during
+  intermediate steps of the pipeline and transport them outside?
+  - I'm not sure all of this diagnostic information should be logged to *MLflow*
+
+
+## Thoughts and Notes
 
 - Adding 3D coordinates gives an opportunity to use tSNE for creating a 2D visualisation
-- Does *Prefect* have a concept of configuration files to pass parameters to the pipeline or to override default parameters of individual tasks?
+- New features can be defined in preprocessing steps in the pipeline using
+  *Pandas* or as part of a feature engineering step in the model itself using
+  *scikit-learn*. My personal thoughts on this are the following:
+  - If *all* of the feature engineering can be done in *scikit-learn*, then
+    this is preferable because simply exporting the model (as a *scikit-learn*
+    pipeline) will include the additional features
+  - If there are elements that have to be implemented outside of the
+    *scikit-learn* model pipeline, then the proper outer pipeline (i.e. the
+    part that is implemented in *Prefect* in this demo) has to be deployed
+    anyways and it is preferable to make the pipeline as clean and consistent
+    as possible - which may mean limiting the amount of feature engineering
+    done with *scikit-learn*.
 
 
 ## Getting Started

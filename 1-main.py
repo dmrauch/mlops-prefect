@@ -22,9 +22,13 @@ import mlops_prefect.pipeline
 import mlops_prefect.data
 
 # %%
-df = mlops_prefect.pipeline.pipeline()
+df = mlops_prefect.pipeline.pipeline(n_dims=3)
 
 # %%
+df
+
+# %%
+# plot the cartesian coordinates
 mlops_prefect.data.plot(df)
 
 # %%
