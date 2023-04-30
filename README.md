@@ -19,6 +19,8 @@ In the end, this repository will contain and showcase the following aspects of a
     - [ ] local feature importance
       - [ ] Shapley values
   - advanced features
+    - [ ] probability calibration
+    - [ ] probabilistic / conformal predictions
     - [ ] hyperparameter optimisation by means of cross validation
     - [ ] add derived features and run automatic feature selection
       - [ ] *scikit-learn*

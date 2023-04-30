@@ -5,6 +5,8 @@ import pandas as pd
 import prefect
 import prefect.tasks
 import sklearn.datasets
+from sklearn.model_selection import train_test_split
+from typing import Tuple
 
 import mlops_prefect.cache
 
@@ -61,6 +63,25 @@ def generate(seed: int = 0,
     df = pd.DataFrame(data=X, columns=columns[:n_dims])
     df['cluster'] = y
     return df
+
+
+@prefect.task(cache_key_fn=prefect.tasks.task_input_hash)
+def split(df: pd.DataFrame,
+          seed: int = 0) -> Tuple[pd.DataFrame]:
+
+    # stratification: the 0.7/0.3 split is ensured for each class (= cluster)
+    df_train, df_test = train_test_split(df,
+                                         test_size=0.3,
+                                         stratify=df.cluster,
+                                         random_state=seed)
+    
+    # version 1: separate dataframes
+    # return df_train, df_test
+
+    # version 2: single dataframe with a column specifying the dataset
+    df_train['dataset'] = 'train'
+    df_test['dataset'] = 'test'
+    return pd.concat([df_train, df_test]).sort_index()
 
 
 def plot(df: pd.DataFrame,

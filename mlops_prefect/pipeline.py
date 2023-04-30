@@ -33,6 +33,10 @@ def pipeline(n_dims: int = 2) -> pd.DataFrame:
     elif n_dims == 3:
         df = mlops_prefect.transform.cartesian_to_spherical(df)
 
+    # train/test split
+    # df_train, df_test = mlops_prefect.data.split(df)
+    df = mlops_prefect.data.split(df)
+
     # TODO: train ML classification
     # TODO: plot the true, predicted and misclassified point clouds
 
