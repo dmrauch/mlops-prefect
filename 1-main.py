@@ -27,7 +27,7 @@ import mlops_prefect.data
 # ## Run the Pipeline
 
 # %%
-df, model = mlops_prefect.pipeline.pipeline(n_dims=3, algorithm='RandomForest')
+df, classifier = mlops_prefect.pipeline.pipeline(n_dims=3, algorithm='RandomForest')
 
 # %% [markdown]
 # ## Results: Generated Data
@@ -72,13 +72,16 @@ df.dataset.value_counts()
 # ## Results: Model
 
 # %%
-model
+classifier
 
 # %%
-df[df.dataset == 'test']
+# check what the classifier pipeline before the actual model does to the inputs
+classifier[:-1].transform(df)
 
 # %%
-model.predict(df.loc[df.dataset == 'test', ['x', 'y', 'z']])
+# calculate all predictions
+df = df.assign(prediction=classifier.predict(df))
+df
 
 # %% [markdown]
 # ### Performance
@@ -88,16 +91,15 @@ import sklearn.metrics
 
 # %%
 # variant 1: the score method -> most limited
-model.score(X=df.loc[df.dataset == 'test', ['x', 'y', 'z']],
-            y=df.loc[df.dataset == 'test', 'cluster'])
+classifier.score(X=df.loc[df.dataset == 'test', ['x', 'y', 'z']],
+                 y=df.loc[df.dataset == 'test', 'cluster'])
 
 # %%
 # variant 2: metrics functions 
 cm_plot = (
-    sklearn.metrics.ConfusionMatrixDisplay.from_estimator(
-        estimator=model,
-        X=df.loc[df.dataset == 'test', ['x', 'y', 'z']],
-        y=df.loc[df.dataset == 'test', 'cluster'])
+    sklearn.metrics.ConfusionMatrixDisplay.from_predictions(
+        y_true=df.loc[df.dataset == 'test', 'cluster'],
+        y_pred=df.loc[df.dataset == 'test', 'prediction'])
     .plot()
 )
 
@@ -106,7 +108,7 @@ cm_plot = (
 print(
     sklearn.metrics.classification_report(
         y_true=df.loc[df.dataset == 'test', 'cluster'],
-        y_pred=model.predict(X=df.loc[df.dataset == 'test', ['x', 'y', 'z']]),
+        y_pred=df.loc[df.dataset == 'test', 'prediction'],
         digits=3))
 
 # %%

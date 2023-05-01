@@ -2,6 +2,9 @@ import datetime as dt
 import pandas as pd
 import prefect
 
+from sklearn import set_config
+set_config(transform_output = "pandas")
+
 import mlops_prefect.data
 import mlops_prefect.transform
 import mlops_prefect.model
@@ -38,12 +41,15 @@ def pipeline(n_dims: int = 2,
     # train/test split: add a 'dataset' column to the dataframe
     df = mlops_prefect.data.split(df)
 
-    # train ML classification model
-    model = mlops_prefect.model.train(df, algorithm=algorithm)
+    # instantiate and train the ML classification model
+    classifier = mlops_prefect.model.train(df, algorithm=algorithm)
 
-    # [ ] evaluate the model
-    # [ ] plot the true, predicted and misclassified point clouds
+    # [ ] calculate predictions for the entire dataset
+    # [ ] possible in parallel:
+    #   [ ] evaluate the model
+    #   [ ] calculate feature permutation importance
+    #   [ ] plot the true, predicted and misclassified point clouds
 
     print("Finished the flow!")
 
-    return df, model
+    return df, classifier
