@@ -1,6 +1,12 @@
 # Data Pipelines and Workflow Orchestration with Prefect
 
 
+> This is an example **multi-class classification machine learning** project to showcase tools and best practices in the areas of
+> - data science: *scikit-learn*
+> - machine learning operations (MLOps): *MLflow*, *Prefect*
+> - software development: *Sphinx*
+
+
 In the end, this repository will contain and showcase the following aspects of an end-to-end machine learning project:
 
 - there will be a pipeline to
@@ -10,7 +16,7 @@ In the end, this repository will contain and showcase the following aspects of a
   - [X] transform the data
     - [X] 2D cartesian -> polar coordinates
     - [X] 3D cartesian -> spherical coordinates
-  - [ ] train an ML model: classify the coordinates to the cluster IDs
+  - [X] train an ML model: classify the coordinates to the cluster IDs
   - [ ] evaluate the model
     - [ ] performance metrics
     - [ ] global feature importance
@@ -26,7 +32,7 @@ In the end, this repository will contain and showcase the following aspects of a
       - [ ] *scikit-learn*
       - [ ] *tsfresh*
 - [ ] the pipeline will be implemented with [*Prefect*](https://www.prefect.io/)
-  - [ ] use caching of intermediate pipeline results
+  - [X] use caching of intermediate pipeline results
   - [ ] add Prefect/Juypter integration
   - [ ] try out [parallel subflows](https://docs.prefect.io/latest/concepts/flows/#composing-flows)
     - need to use `.submit` as per [doc: guide](https://docs.prefect.io/latest/guides/dask-ray-task-runners/) and [doc: tutorial](https://docs.prefect.io/latest/tutorials/execution/)
@@ -57,6 +63,8 @@ In the end, this repository will contain and showcase the following aspects of a
 
 ## Questions
 
+- [ ] How to run *Prefect*-integrated code without *Prefect* (e.g. in an
+      environment where this is not supported)?
 - [ ] Does *Prefect* have a concept of configuration files to pass parameters to the pipeline or to override default parameters of individual tasks?
 - [ ] How best to generate visualisations and dataframe printouts during
   intermediate steps of the pipeline and transport them outside?

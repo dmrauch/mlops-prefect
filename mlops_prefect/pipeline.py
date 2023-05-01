@@ -42,6 +42,18 @@ def pipeline(n_dims: int = 2,
     df = mlops_prefect.data.split(df)
 
     # instantiate and train the ML classification model
+    # [ ] calculate new derived features as part of the model pipeline
+    # [ ] add an optional feature selection/elimination step
+    #   [ ] if this is switched off, all the features should be used
+    # [ ] make the `algorithm` parameter accept lists, in which case
+    #     all the algorithms should be tested and the best one should be
+    #     chosen based on a cross-validation strategy
+    #   [ ] with an additional parameter, the cross-validation should be
+    #       prevented and models based on all specified algorithms should
+    #       be trained and combined to an ensemble model
+    # [ ] add an optional nested dictionary with the algorithms as the keys
+    #     and the values specifying the hyperparameter space for a
+    #     hyperparameter optimisation
     classifier = mlops_prefect.model.train(df, algorithm=algorithm)
 
     # [ ] calculate predictions for the entire dataset

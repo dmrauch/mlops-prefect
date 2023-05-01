@@ -118,9 +118,13 @@ print(
 # %% [markdown]
 # ## Cross-Validation
 
+# %% [markdown]
+# If no feature selection, hyperparameter optimisation or anything else that requires an automated decision is done, then no cross validation is needed as part of the model pipeline. Still, cross-validation may be run manually separately to get an impression of the impact of the dataset splits.
+
 # %%
 import numpy as np
-from sklearn.model_selection import StratifiedKFold, cross_val_score
+from sklearn.model_selection import (
+    StratifiedKFold, cross_val_score, cross_validate)
 
 import mlops_prefect.cv
 
@@ -128,6 +132,8 @@ import mlops_prefect.cv
 # ### Simple: `cross_val_score`()
 
 # %% [markdown]
+# *scikit-learn* documentation: [cross_val_score](https://scikit-learn.org/stable/modules/generated/sklearn.model_selection.cross_val_score.html)
+#
 # - limited to a single metric
 
 # %%
@@ -159,5 +165,68 @@ mlops_prefect.cv.get_class_composition(
                   1: 'cluster 1',
                   2: 'cluster 2'}
 )
+
+# %% [markdown]
+# ### Advanced: `cross_validate()`
+
+# %% [markdown]
+# *scikit-learn* documentation: [cross_validate](https://scikit-learn.org/stable/modules/generated/sklearn.model_selection.cross_validate.html)
+#
+# - supports multiple metrics
+# - returns the fit and score times as well as (optionally) the training scores
+#   and the fitted models
+
+# %%
+import sklearn.metrics
+
+# %%
+# single metric
+cross_validate(classifier,
+               X=df.loc[df.dataset == 'train'],
+               y=df.loc[df.dataset == 'train', 'cluster'])
+
+# %%
+# - multiple metrics
+# - training scores
+# - retain all the models
+#
+# questions:
+# [ ] what is the difference between 'micro' and 'weighted'?
+#   [ ] why does it make a difference for precision, but not for recall?
+# [ ] why do the ROC AUC and average precision scores not work?
+cross_validate(
+    classifier,
+    X=df.loc[df.dataset == 'train'],
+    y=df.loc[df.dataset == 'train', 'cluster'],
+    scoring={
+        # 'roc_auc_ovr_weighted': sklearn.metrics.make_scorer(
+        #     sklearn.metrics.roc_auc_score,
+        #     multi_class='ovr',
+        #     average='weighted'),
+        # 'average_precision_weighted': sklearn.metrics.make_scorer(
+        #     sklearn.metrics.average_precision_score,
+        #     average='weighted'),
+        'accuracy': sklearn.metrics.make_scorer(
+            sklearn.metrics.accuracy_score),
+        'precision_micro': sklearn.metrics.make_scorer(
+            sklearn.metrics.precision_score,
+            average='micro'),
+        'precision_weighted': sklearn.metrics.make_scorer(
+            sklearn.metrics.precision_score,
+            average='weighted'),
+        'recall_micro': sklearn.metrics.make_scorer(
+            sklearn.metrics.recall_score,
+            average='micro'),
+        'recall_weighted': sklearn.metrics.make_scorer(
+            sklearn.metrics.recall_score,
+            average='weighted'),
+        'F1_weighted': sklearn.metrics.make_scorer(
+            sklearn.metrics.f1_score,
+            average='weighted'),
+        'mcc': sklearn.metrics.make_scorer(
+            sklearn.metrics.matthews_corrcoef)
+    },
+    return_train_score=True,
+    return_estimator=True)
 
 # %%
