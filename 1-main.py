@@ -115,4 +115,49 @@ print(
         y_pred=df.loc[df.dataset == 'test', 'prediction'],
         digits=3))
 
+# %% [markdown]
+# ## Cross-Validation
+
+# %%
+import numpy as np
+from sklearn.model_selection import StratifiedKFold, cross_val_score
+
+import mlops_prefect.cv
+
+# %% [markdown]
+# ### Simple: `cross_val_score`()
+
+# %% [markdown]
+# - limited to a single metric
+
+# %%
+# if the classifier is derived from sklearn.base.ClassifierMixin, the
+# cross-validation will automatically use the StratifiedKFold procedure
+scores = cross_val_score(classifier,
+                         X=df.loc[df.dataset == 'train'],
+                         y=df.loc[df.dataset == 'train', 'cluster'])
+print(scores)
+print(f'-> mean +/- std = {np.mean(scores):.4f} +/- {np.std(scores):.4f}')
+
+# %%
+# shuffle = False would also be ok because df contains the points in random
+# order and not sorted by cluster
+cv = StratifiedKFold(n_splits=5, shuffle=True, random_state=0)
+scores = cross_val_score(classifier,
+                         X=df.loc[df.dataset == 'train'],
+                         y=df.loc[df.dataset == 'train', 'cluster'],
+                         cv=cv)
+print(scores)
+print(f'-> mean +/- std = {np.mean(scores):.4f} +/- {np.std(scores):.4f}')
+
+# %%
+# check the compositions of the CV splits in terms of the target classes
+mlops_prefect.cv.get_class_composition(
+    df[df.dataset == 'train'],
+    cv,
+    class_labels={0: 'cluster 0',
+                  1: 'cluster 1',
+                  2: 'cluster 2'}
+)
+
 # %%
