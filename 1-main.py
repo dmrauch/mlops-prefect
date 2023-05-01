@@ -48,24 +48,28 @@ df.dataset.value_counts()
 
 # %%
 # check the stratification of the train/test split:
-# calculate the relative size of the datasets for each class (= cluster)
+# calculate the class (= cluster) compositions in each dataset split
 (
-    # number of samples in each cluster and each dataset
-    pd.DataFrame(df.groupby('cluster').dataset.value_counts()
+    # number of samples in each dataset and each cluster
+    pd.DataFrame(df.groupby('dataset').cluster.value_counts()
                  .rename('samples')
                  .reset_index()
     )
-    # number of samples in each cluster
-    .merge(right=df.groupby('cluster').size().rename('class cardinality'),
+    # number of samples in each dataset
+    .merge(right=df.groupby('dataset').size().rename('dataset size'),
            how='left',
-           on='cluster'
+           on='dataset'
     )
-    # fraction of each dataset within each cluster
+    # fraction of each cluster within each dataset
     .assign(**{
-        'dataset fraction':
-            lambda dfx: dfx['samples']/dfx['class cardinality']
+        'cluster fraction':
+            lambda dfx: dfx['samples']/dfx['dataset size']
     })
-    .set_index(['cluster', 'dataset'])
+    .set_index(['dataset', 'cluster'])
+    .reindex([
+        ('train', 0), ('train', 1), ('train', 2),
+        ('test', 0), ('test', 1), ('test', 2)
+    ])
 )
 
 # %% [markdown]
