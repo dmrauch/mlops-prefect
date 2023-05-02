@@ -1,10 +1,13 @@
 import datetime as dt
 import pandas as pd
 import prefect
+import sklearn.pipeline
+from typing import Dict, Tuple, Union
 
 from sklearn import set_config
 set_config(transform_output = "pandas")
 
+import mlops_prefect.cv
 import mlops_prefect.data
 import mlops_prefect.transform
 import mlops_prefect.model
@@ -18,13 +21,32 @@ def task_hello() -> None:
     print('Hello and welcome to the first task!')
 
 
-@prefect.flow(
-        name='cluster-classification',
-        flow_run_name=dt.datetime.now().strftime('%Y%m%d-%H%M%S'))
-def pipeline(n_dims: int = 2,
-             algorithm: str = 'DecisionTree') -> pd.DataFrame:
+@prefect.flow(name='cluster-classification',
+              flow_run_name=dt.datetime.now().strftime('%Y%m%d-%H%M%S'))
+def run(n_dims: int = 2,
+        algorithms: Union[str, frozenset[str]] = 'DecisionTree',
+        cv_metric: str = 'matthews_corrcoef'
+        ) -> Tuple[pd.DataFrame,
+                   sklearn.pipeline.Pipeline,
+                   pd.DataFrame,
+                   pd.DataFrame]:
     '''
     Complete pipeline from data generation to model validation
+
+    Parameters
+    ----------
+    algorithms
+        If one algorithm is given, a single classifier is trained and returned.
+        If more than one algorithm is specified, multiple classifiers are
+        trained (one model for each classifier) and the best-performing model
+        is returned. The metric used for determining the best-performing is
+        specified with the :param:`cv_metric` parameter.
+    cv_metric
+        When multiple algorithms are specified with the :param:`algorithm`
+        parameter, the model performance is evaluated by means of cross-
+        validation (CV), stratified by the target classes, taking the mean
+        value of the metric specified by `cv_metric` of the metric values
+        obtained from the different CV validation folds.
     '''
     print("This is a minimal flow - let's start!")
     task_hello()
@@ -45,7 +67,7 @@ def pipeline(n_dims: int = 2,
     # [ ] calculate new derived features as part of the model pipeline
     # [ ] add an optional feature selection/elimination step
     #   [ ] if this is switched off, all the features should be used
-    # [ ] make the `algorithm` parameter accept lists, in which case
+    # [ ] make the `algorithm` parameter accept a frozenset, in which case
     #     all the algorithms should be tested and the best one should be
     #     chosen based on a cross-validation strategy
     #   [ ] with an additional parameter, the cross-validation should be
@@ -54,7 +76,28 @@ def pipeline(n_dims: int = 2,
     # [ ] add an optional nested dictionary with the algorithms as the keys
     #     and the values specifying the hyperparameter space for a
     #     hyperparameter optimisation
-    classifier = mlops_prefect.model.train(df, algorithm=algorithm)
+    if isinstance(algorithms, str):
+        algorithms = frozenset({algorithms})
+    classifiers = {}
+    cv_splits = {}
+    cv_results = {}
+    # [ ] run all of this in parallel
+    for algorithm in algorithms:
+        # train a classifier for each algorithm
+        classifiers[algorithm] = mlops_prefect.model.train(
+            df, algorithm=algorithm)
+        
+        # evaluate the model performance
+        cv_splits[algorithm], cv_results[algorithm] = (
+            mlops_prefect.model.cross_validate(
+                classifier=classifiers[algorithm], df=df))
+
+    # collect and aggregate the CV results
+    df_cv_results = mlops_prefect.cv.aggregate_cv_results(cv_results)
+
+    # pick the best classifier
+    best_algorithm = mlops_prefect.cv.get_best_algorithm(
+        classifiers, df_cv_results, cv_metric)
 
     # [ ] calculate predictions for the entire dataset
     # [ ] possible in parallel:
@@ -64,4 +107,7 @@ def pipeline(n_dims: int = 2,
 
     print("Finished the flow!")
 
-    return df, classifier
+    return (df,
+            classifiers[best_algorithm],
+            cv_splits[best_algorithm],
+            df_cv_results)

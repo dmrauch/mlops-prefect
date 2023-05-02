@@ -27,7 +27,21 @@ import mlops_prefect.data
 # ## Run the Pipeline
 
 # %%
-df, classifier = mlops_prefect.pipeline.pipeline(n_dims=3, algorithm='RandomForest')
+df, classifier, df_cv_splits, df_cv_results = mlops_prefect.pipeline.run(
+    n_dims=3,
+    # algorithms=['DecisionTree', 'RandomForest']
+    algorithms=['DecisionTree', 'RandomForest', 'GradientBoosting']
+)
+
+# %%
+df_cv_splits
+
+# %%
+print('best model:', mlops_prefect.model.get_algorithm(classifier))
+classifier
+
+# %%
+df_cv_results
 
 # %% [markdown]
 # ## Results: Generated Data

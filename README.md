@@ -25,9 +25,11 @@ In the end, this repository will contain and showcase the following aspects of a
     - [ ] local feature importance
       - [ ] Shapley values
   - advanced features
-    - [ ] probability calibration
-    - [ ] probabilistic / conformal predictions
     - [ ] hyperparameter optimisation by means of cross validation
+    - [ ] probability calibration: *scikit-learn* [CalibratedClassifierCV](https://scikit-learn.org/stable/modules/generated/sklearn.calibration.CalibratedClassifierCV.html) and [calibration_curve](https://scikit-learn.org/stable/modules/generated/sklearn.calibration.calibration_curve.html)
+    - [ ] multiple (calibrated) classifiers combined with a *scikit-learn* [VotingClassifier](https://scikit-learn.org/stable/modules/generated/sklearn.ensemble.VotingClassifier.html)
+    - [X] configurable alternative: best-model selection from list of specified algorithms
+    - [ ] probabilistic / conformal predictions
     - [ ] add derived features and run automatic feature selection
       - [ ] *scikit-learn*
       - [ ] *tsfresh*

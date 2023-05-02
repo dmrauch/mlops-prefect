@@ -1,5 +1,7 @@
 import pandas as pd
+import prefect
 from sklearn.model_selection import BaseCrossValidator
+import sklearn.pipeline
 from typing import Any, Dict
 
 
@@ -147,3 +149,65 @@ def get_class_composition(data: pd.DataFrame,
         dfx
         .sort_index(axis='index', level='composition')
     )
+
+
+@prefect.task
+def aggregate_cv_results(cv_results: Dict[str, Dict],
+                         aggregation: str = 'mean') -> pd.DataFrame:
+    '''
+    Parameters
+    ----------
+    cv_results
+        Dictionary with the algorithm names as the keys and the CV results
+        dictionaries returned by :func:`sklearn.model_selection.cross_validate`
+        as they values
+    aggregation
+        The aggregation function to apply to each metric across the different
+        CV folds
+    '''
+    datasets = set([key.split('_')[0]
+                    for cv_result in cv_results.values()
+                    for key in cv_result.keys()])
+    metrics = set([key.replace('test_', '')
+                for cv_result in cv_results.values()
+                for key in cv_result.keys() if 'test_' in key])
+
+    dataset_map = {'train': 'train', 'test': 'val'}
+    cv_result_cols = {
+        f'{dataset_old}_{m}': (m, dataset_new, 'values')
+        for m in metrics
+        for dataset_old, dataset_new in dataset_map.items()
+        if dataset_old in datasets
+    }
+
+    cv_result_rows = list(cv_results.keys())
+    df_cv_results = pd.DataFrame(
+        columns=pd.MultiIndex.from_tuples(list(cv_result_cols.values()),
+                                        names=('metric', 'dataset', 'aggregation')),
+        index=cv_result_rows
+    )
+    df_cv_results.index.name = 'algorithm'
+    for alg, cv_result in cv_results.items():
+        for col_old, col_new in cv_result_cols.items():
+            df_cv_results.at[alg, col_new] = cv_result[col_old]
+
+    # calculate the mean and standard deviation
+    for col in cv_result_cols.values():
+        exploded = df_cv_results[col].explode()
+        df_cv_results[tuple([*col[:2], aggregation])] = (
+            exploded.groupby(exploded.index).agg(aggregation))
+        df_cv_results.drop(columns=[col], inplace=True)
+
+    df_cv_results.columns = df_cv_results.columns.droplevel('aggregation')
+    df_cv_results = df_cv_results.astype(float)
+    return df_cv_results
+
+
+@prefect.task
+def get_best_algorithm(
+        classifiers: Dict[str, sklearn.pipeline.Pipeline],
+        df_cv_results: pd.DataFrame,
+        cv_metric: str = 'mcc') -> sklearn.pipeline.Pipeline:
+
+    best_algorithm = df_cv_results[(cv_metric, 'val')].idxmax()
+    return best_algorithm
