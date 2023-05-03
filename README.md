@@ -25,19 +25,21 @@ In the end, this repository will contain and showcase the following aspects of a
     - [ ] local feature importance
       - [ ] Shapley values
   - advanced features
+    - [ ] add derived features and run automatic feature selection
+      - [ ] *scikit-learn*
+      - [ ] *tsfresh*
     - [ ] hyperparameter optimisation by means of cross validation
     - [ ] probability calibration: *scikit-learn* [CalibratedClassifierCV](https://scikit-learn.org/stable/modules/generated/sklearn.calibration.CalibratedClassifierCV.html) and [calibration_curve](https://scikit-learn.org/stable/modules/generated/sklearn.calibration.calibration_curve.html)
     - [ ] multiple (calibrated) classifiers combined with a *scikit-learn* [VotingClassifier](https://scikit-learn.org/stable/modules/generated/sklearn.ensemble.VotingClassifier.html)
     - [X] configurable alternative: best-model selection from list of specified algorithms
+    - [ ] try out counterfactuals: [mlextend.evaluate.create_counterfactual](https://rasbt.github.io/mlxtend/user_guide/evaluate/create_counterfactual/)
     - [ ] probabilistic / conformal predictions
-    - [ ] add derived features and run automatic feature selection
-      - [ ] *scikit-learn*
-      - [ ] *tsfresh*
 - [ ] the pipeline will be implemented with [*Prefect*](https://www.prefect.io/)
   - [X] use caching of intermediate pipeline results
   - [ ] add Prefect/Juypter integration
-  - [ ] try out [parallel subflows](https://docs.prefect.io/latest/concepts/flows/#composing-flows)
-    - need to use `.submit` as per [doc: guide](https://docs.prefect.io/latest/guides/dask-ray-task-runners/) and [doc: tutorial](https://docs.prefect.io/latest/tutorials/execution/)
+  - [X] try out parallelisation
+    - need to use `.submit()` and `.result()` as per [doc: Tutorials/Configuration](https://docs.prefect.io/latest/tutorials/flow-task-config/#configuring-task-runners) and [doc: Tutorials/Execution](https://docs.prefect.io/latest/tutorials/execution/)
+  - [ ] distributed calculation: [doc: Guides/Dask & Ray](https://docs.prefect.io/latest/guides/dask-ray-task-runners/)
 - [ ] experiments will be tracked with *MLflow*
   - [ ] using not the *local filesystem*, but rather the *SQLite* backend store option, in order to support model serving
 - best practices

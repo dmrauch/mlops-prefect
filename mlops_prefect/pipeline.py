@@ -79,18 +79,33 @@ def run(n_dims: int = 2,
     if isinstance(algorithms, str):
         algorithms = frozenset({algorithms})
     classifiers = {}
-    cv_splits = {}
-    cv_results = {}
-    # [ ] run all of this in parallel
+    cv_futures = {}
+    # perform model training and cross-validation in parallel
+    # - submitting the calculation with `.submit()` allows for parallel
+    #   task execution where possible, but returns a future that later
+    #   has to be resolved with `.result()` when the results are needed
+    # - it is not even necessary to explicitly set
+    #   `task_runner=prefect.task_runners.ConcurrentTaskRunner()`
+    #   in the flow decorator because the ConcurrentTaskRunner is the
+    #   default anyway
     for algorithm in algorithms:
+
         # train a classifier for each algorithm
-        classifiers[algorithm] = mlops_prefect.model.train(
+        classifiers[algorithm] = mlops_prefect.model.train.submit(
             df, algorithm=algorithm)
         
         # evaluate the model performance
-        cv_splits[algorithm], cv_results[algorithm] = (
-            mlops_prefect.model.cross_validate(
+        cv_futures[algorithm] = (
+            mlops_prefect.model.cross_validate.submit(
                 classifier=classifiers[algorithm], df=df))
+
+    # wait for and gather the results of the parallel execution of the
+    # model training and cross-validation
+    cv_splits = {}
+    cv_results = {}
+    for algorithm in algorithms:
+        cv_splits[algorithm], cv_results[algorithm] = (
+            cv_futures[algorithm].result())
 
     # collect and aggregate the CV results
     df_cv_results = mlops_prefect.cv.aggregate_cv_results(cv_results)
@@ -100,7 +115,7 @@ def run(n_dims: int = 2,
         classifiers, df_cv_results, cv_metric)
 
     # [ ] calculate predictions for the entire dataset
-    # [ ] possible in parallel:
+    # [ ] possibly in parallel:
     #   [ ] evaluate the model
     #   [ ] calculate feature permutation importance
     #   [ ] plot the true, predicted and misclassified point clouds
